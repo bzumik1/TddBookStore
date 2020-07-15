@@ -77,9 +77,6 @@ class BookShelfSpec {
         }
     }
 
-
-
-
     @Nested @DisplayName("arranging books in BookShelf")
     class ArrangementOfBooks{
         @Test @DisplayName("arrange method returns all books arranged by name")
@@ -150,10 +147,6 @@ class BookShelfSpec {
         }
     }
 
-
-
-
-
     @Test @DisplayName("toString method should return number of books and it's names")
     void shelfToStringShouldPrintBookCountAndTitles(){
         bookShelf.add(effectiveJava);
@@ -165,12 +158,43 @@ class BookShelfSpec {
 
     }
 
-
-
     @Test @DisplayName("disabled test") @Disabled("Mock test is disabled.")
     void disabledTest(){
         System.out.println("Test is running");
     }
+
+    @Nested @DisplayName("search")
+    class BookShelfSearchSpec{
+        @BeforeEach
+        void searchInicialization(){
+            bookShelf.add(codeComplete,effectiveJava, mythicalManMonth,cleanCode);
+        }
+
+        @Test @DisplayName("finds books with title containing search-term")
+        void searchForBooksByGivenText(){
+            List<Book> foundBooks = bookShelf.findBooksByTitle("code");
+            assertThat(foundBooks.size())
+                    .as("Should find two books.")
+                    .isEqualTo(2);
+        }
+
+        @Test @DisplayName("finds books with title containing search-term and published after date")
+        void searchForBooksByTitleAndDate(){
+            List<Book> books = bookShelf.findBooksByTitle("code",
+                    book -> book.getPublishedOn().isBefore(LocalDate.of(2014,Month.DECEMBER,31)));
+            assertThat(books.size())
+                    .as("Should find two books")
+                    .isEqualTo(2);
+        }
+
+        @Test @DisplayName("finds books after aplying multiple filters for search")
+        void compositeFilters(){
+            BookFilter filterByName;
+            BookFilter filterByYear = BookPublishedYearFilter.before(2016);
+        }
+    }
+
+
 
 
 }
