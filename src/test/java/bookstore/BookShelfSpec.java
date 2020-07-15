@@ -3,6 +3,7 @@ package bookstore;
 
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -11,7 +12,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-
+@ExtendWith(BooksParameterResolver.class)
 @DisplayName("<= BookShelf Specification =>")
 class BookShelfSpec {
     private BookShelf bookShelf;
@@ -25,12 +26,12 @@ class BookShelfSpec {
     }
 
     @BeforeEach
-    void initializeBookShelf(){
+    void initializeBookShelf(Map<String, Book> books){
         bookShelf = new BookShelf();
-        effectiveJava = new Book("Effective Java", "Joshua Bloch", LocalDate.of(2008, Month.MAY, 8));
-        cleanCode = new Book("Clean Code", "Robert Cecil Martin", LocalDate.of(2008, Month.AUGUST, 1));
-        codeComplete = new Book("Code Complete","Steve McConnel", LocalDate.of(2004, Month.JUNE, 9));
-        mythicalManMonth = new Book("The Mythical Man-Month", "Frederick Phillips Brooks", LocalDate.of(1975, Month.JANUARY, 1));
+        effectiveJava = books.get("Effective Java");
+        cleanCode = books.get("Clean Code");
+        codeComplete = books.get("Code Complete");
+        mythicalManMonth = books.get("The Mythical Man-Month");
     }
 
     @Nested @DisplayName("is empty")
