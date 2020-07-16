@@ -163,7 +163,7 @@ class BookShelfSpec {
         System.out.println("Test is running");
     }
 
-    @Nested @DisplayName("search")
+    @Nested @DisplayName("returns correct search results")
     class BookShelfSearchSpec{
         @BeforeEach
         void searchInicialization(){
@@ -187,11 +187,29 @@ class BookShelfSpec {
                     .isEqualTo(2);
         }
 
-        @Test @DisplayName("finds books after aplying multiple filters for search")
+        @Test @DisplayName("finds books after allying multiple filters for search")
         void compositeFilters(){
             BookFilter filterByName;
             BookFilter filterByYear = BookPublishedYearFilter.before(2016);
         }
+    }
+
+    @Nested @DisplayName("throws propper exceptions")
+    class bookShelfExceptions{
+        @Test @DisplayName("throws BookShelfCapacityReached error when full capacyty is rechaed")
+        void capacityReachedError(){
+            final int maxCapacity = bookShelf.getMAX_CAPACITY();
+
+            //fills the BookShelf to max capacity
+            for(int index = 0;index<(maxCapacity);index++){
+                bookShelf.add(new Book("Book "+index,"Test",LocalDate.now()));
+            }
+            //adds one additional book which should cause BookShelfCapacityReached exception
+            Exception e = assertThrows(BookShelfCapacityReached.class,
+                    () -> bookShelf.add(new Book("Book ERROR","Test",LocalDate.now())));
+            assertThat(e).hasMessage("BookShelf max capacity reached.");
+        }
+
     }
 
 

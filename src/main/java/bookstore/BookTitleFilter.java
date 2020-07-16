@@ -13,6 +13,9 @@ public class BookTitleFilter implements BookFilter {
 
     @Override
     public boolean apply(Book book) {
+        if(book == null){
+            return false;
+        }
         return book.getTitle().toLowerCase().contains(searchTerm.toLowerCase());
     }
 }

@@ -1,10 +1,8 @@
 package bookstore;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
 import java.util.Map;
 
@@ -43,16 +41,27 @@ public class BookFilterSpec {
     }
 
     @Nested @DisplayName("book title")
-    class bookTitle{
+    class bookTitle implements FilterBoundaryTest{
+        BookFilter filter;
+
+        @BeforeEach
+        void initializeBookFilterForPublishedDate(){
+            filter = BookTitleFilter.searchTerm("code");
+        }
         @Test @DisplayName("title contains search-term")
         void titleContainsSearchTerm(){
             BookFilter filter = BookTitleFilter.searchTerm("code");
             assertThat(filter.apply(codeComplete)).isTrue();
         }
+
+        @Override
+        public BookFilter get() {
+            return filter;
+        }
     }
 
     @Nested @DisplayName("composite filter")
-    class compositeFilter{
+    class compositeFilter implements FilterBoundaryTest{
         CompositeFilter compositeFilter;
 
         @BeforeEach
@@ -74,6 +83,29 @@ public class BookFilterSpec {
                     .add(book -> false)
                     .add(book -> true);
             assertThat(compositeFilter.apply(codeComplete)).isFalse();
+        }
+
+        @Tag("slow")
+        @Test @DisplayName("composite criteria invokes all filters")
+        void compositeCriteriaAllFilters(){
+            BookFilter firstInvokedMockedFilter = Mockito.mock(BookFilter.class);
+            Mockito.when(firstInvokedMockedFilter.apply(cleanCode)).thenReturn(true);
+            compositeFilter.add(firstInvokedMockedFilter);
+
+            BookFilter secondInvokedMockedFilter = Mockito.mock(BookFilter.class);
+            Mockito.when(secondInvokedMockedFilter.apply(cleanCode)).thenReturn(true);
+            compositeFilter.add(secondInvokedMockedFilter);
+
+            assertThat(compositeFilter.apply(cleanCode))
+                    .isTrue();
+
+            Mockito.verify(firstInvokedMockedFilter).apply(cleanCode);
+            Mockito.verify(secondInvokedMockedFilter).apply(cleanCode);
+        }
+
+        @Override
+        public BookFilter get() {
+            return compositeFilter;
         }
     }
 

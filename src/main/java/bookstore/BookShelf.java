@@ -14,11 +14,19 @@ import java.util.stream.Collectors;
 @Getter
 public class BookShelf {
     private final List<Book> books = new ArrayList<>();
+    private final int MAX_CAPACITY = 100;
 
 
 
-    public void add(Book... books){
-        this.books.addAll(Arrays.asList(books));
+    public void add(Book... books) throws BookShelfCapacityReached{
+        Arrays.stream(books).forEach(this::addBookToBookShelf);
+    }
+
+    private void addBookToBookShelf(Book book){
+        if(books.size() >= MAX_CAPACITY){
+            throw new BookShelfCapacityReached();
+        }
+        books.add(book);
     }
 
     public List<Book> getBooks(){

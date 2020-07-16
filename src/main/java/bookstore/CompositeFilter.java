@@ -15,6 +15,9 @@ public class CompositeFilter implements BookFilter {
 
     @Override
     public boolean apply(Book book) {
+        if(book ==null){
+            return false;
+        }
         return bookFilters.stream().allMatch(bookFilter -> bookFilter.apply(book));
     }
 }
